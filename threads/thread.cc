@@ -24,6 +24,8 @@
 					// execution stack, for detecting 
 					// stack overflows
 
+int GetAvailableThreadID() { return 1;}
+
 //----------------------------------------------------------------------
 // Thread::Thread
 // 	Initialize a thread control block, so that we can then call
@@ -35,6 +37,9 @@
 Thread::Thread(char* threadName)
 {
     name = threadName;
+    threadID = GetAvailableThreadID();
+    //
+    userID = DEFAULT_USER_ID;
     stackTop = NULL;
     stack = NULL;
     status = JUST_CREATED;

@@ -39,6 +39,4 @@ test/halt
 
 test/shell
 
-test/halt
-
-test/shell
+*nachos
