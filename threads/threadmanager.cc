@@ -33,7 +33,8 @@ ThreadManager::createThread(char *debugName) {
 		return NULL;
 	} else {
 		newThread = new Thread(debugName, tid);
-		threadList->SortedInsert((void *)newThread, tid);
+		newThread->setPriority(PRIORITY_MID);
+//		threadList->SortedInsert((void *)newThread, tid);
 	}
 	return newThread;
 }
@@ -43,7 +44,7 @@ ThreadManager::deleteThread(Thread *thread) {
 	if (thread != NULL) {
 		int tid = thread->getThreadID();
 		threadMap[tid] = 0;
-		threadList->RemoveElement(thread);
+//		threadList->RemoveElement(thread);
 		delete thread;
 	}
 }

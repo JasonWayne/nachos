@@ -50,6 +50,10 @@
 // For simplicity, this is just the max over all architectures.
 #define MachineStateSize 18 
 
+#define PRIORITY_HIGH 0
+#define PRIORITY_MID 1
+#define PRIORITY_LOW 2
+
 
 // Size of the thread's private execution stack.
 // WATCH OUT IF THIS ISN'T BIG ENOUGH!!!!!
@@ -106,6 +110,8 @@ class Thread {
     char* getName() { return (name); }
     int getThreadID() {return threadID; }
     int getUserID() {return userID; }
+    void setPriority(int n) { priority = n; }
+    int getPriority() { return priority; }
     void Print() { printf("thread name --> %s, thread ID --> %d, user ID --> %d\n", name, threadID, userID); }
 
   private:
@@ -118,6 +124,7 @@ class Thread {
     char* name;
     int threadID;
     int userID;
+    int priority;
 
 
     void StackAllocate(VoidFunctionPtr func, int arg);

@@ -15,7 +15,7 @@
 extern ThreadManager *threadManager;
 
 // testnum is set in main.cc
-int testnum = 1;
+int testnum = 2;
 
 //----------------------------------------------------------------------
 // SimpleThread
@@ -61,15 +61,42 @@ ThreadTest1()
 //----------------------------------------------------------------------
 
 void
+ThreadTest2()
+{
+	DEBUG('t', "Entering ThreadTest2");
+
+	Thread *t1 = threadManager->createThread("Thread1 Low");
+	t1->setPriority(PRIORITY_LOW);
+	Thread *t2 = threadManager->createThread("Thread2 High");
+	t2->setPriority(PRIORITY_MID);
+	Thread *t3 = threadManager->createThread("Thread3 High");
+	t3->setPriority(PRIORITY_HIGH);
+	Thread *t4 = threadManager->createThread("Thread4 High");
+	t4->setPriority(PRIORITY_HIGH);
+	Thread *t5 = threadManager->createThread("Thread5 Mid");
+	t5->setPriority(PRIORITY_MID);
+
+	t1->Fork(SimpleThread, 1);
+	t2->Fork(SimpleThread, 2);
+	t3->Fork(SimpleThread, 3);
+	t4->Fork(SimpleThread, 4);
+	t5->Fork(SimpleThread, 5);
+
+	SimpleThread(0);
+}
+void
 ThreadTest()
 {
     switch (testnum) {
     case 1:
-	ThreadTest1();
-	break;
+    	ThreadTest1();
+    	break;
+    case 2:
+    	ThreadTest2();
+    	break;
     default:
-	printf("No test specified.\n");
-	break;
+    	printf("No test specified.\n");
+    	break;
     }
 }
 
