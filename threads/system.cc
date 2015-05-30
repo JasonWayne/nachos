@@ -18,6 +18,7 @@ Interrupt *interrupt;			// interrupt status
 Statistics *stats;			// performance metrics
 Timer *timer;				// the hardware timer device,
 					// for invoking context switches
+ThreadManager *threadManager;
 
 #ifdef FILESYS_NEEDED
 FileSystem  *fileSystem;
@@ -135,13 +136,15 @@ Initialize(int argc, char **argv)
     scheduler = new Scheduler();		// initialize the ready queue
     if (randomYield)				// start the timer (if needed)
 	timer = new Timer(TimerInterruptHandler, 0, randomYield);
+    threadManager = new ThreadManager();
 
     threadToBeDestroyed = NULL;
 
     // We didn't explicitly allocate the current thread we are running in.
     // But if it ever tries to give up the CPU, we better have a Thread
     // object to save its state. 
-    currentThread = new Thread("main");		
+//    currentThread = new Thread("main");
+    currentThread = threadManager->createThread("main");
     currentThread->setStatus(RUNNING);
 
     interrupt->Enable();

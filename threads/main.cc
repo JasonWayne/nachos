@@ -88,6 +88,7 @@ main(int argc, char **argv)
     (void) Initialize(argc, argv);
     
 #ifdef THREADS
+    bool printStatus = false;
     for (argc--, argv++; argc > 0; argc -= argCount, argv += argCount) {
       argCount = 1;
       switch (argv[0][1]) {
@@ -99,9 +100,15 @@ main(int argc, char **argv)
         testnum = 1;
         break;
       }
+      if (!strcmp(*argv, "--threadstatus")) {
+      	printStatus = true;
+      }
     }
 
     ThreadTest();
+    if (printStatus) {
+    	threadManager->printThreads();
+    }
 #endif
 
     for (argc--, argv++; argc > 0; argc -= argCount, argv += argCount) {
@@ -169,3 +176,4 @@ main(int argc, char **argv)
 				// it from returning.
     return(0);			// Not reached...
 }
+

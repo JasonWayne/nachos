@@ -221,12 +221,12 @@ List::SortedRemove(int *keyPtr)
     void *thing;
 
     if (IsEmpty()) 
-	return NULL;
+    	return NULL;
 
     thing = first->item;
     if (first == last) {	// list had one item, now has none 
         first = NULL;
-	last = NULL;
+        last = NULL;
     } else {
         first = element->next;
     }
@@ -234,5 +234,34 @@ List::SortedRemove(int *keyPtr)
         *keyPtr = element->key;
     delete element;
     return thing;
+}
+
+void *
+List::RemoveElement(void *target) {
+	ListElement *current = NULL;
+	ListElement *previous = NULL;
+
+	for (ListElement *ptr = first; ptr != NULL; ptr++) {
+		if (ptr->item == target) {
+			current = ptr;
+			break;
+		}
+		previous = ptr;
+	}
+
+	if (current) {
+		if (current == first) {
+			if (first == last) {
+				first = NULL;
+				last = NULL;
+			} else {
+				first = current->next;
+			}
+		} else {
+			previous->next = current->next;
+		}
+	}
+	delete current;
+	return target;
 }
 

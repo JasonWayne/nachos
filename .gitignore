@@ -39,4 +39,8 @@ test/halt
 
 test/shell
 
-*nachos
+filesys/nachos
+network/nachos
+threads/nachos
+userprog/nachos
+vm/nachos

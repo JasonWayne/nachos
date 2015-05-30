@@ -12,6 +12,8 @@
 #include "copyright.h"
 #include "system.h"
 
+extern ThreadManager *threadManager;
+
 // testnum is set in main.cc
 int testnum = 1;
 
@@ -31,7 +33,6 @@ SimpleThread(int which)
     
     for (num = 0; num < 5; num++) {
     	printf("*** thread %d looped %d times\n", which, num);
-        currentThread->Print();
         currentThread->Yield();
     }
 }
@@ -47,7 +48,8 @@ ThreadTest1()
 {
     DEBUG('t', "Entering ThreadTest1");
 
-    Thread *t = new Thread("forked thread");
+//    Thread *t = new Thread("forked thread");
+    Thread *t = threadManager->createThread("forked thread");
 
     t->Fork(SimpleThread, 1);
     SimpleThread(0);

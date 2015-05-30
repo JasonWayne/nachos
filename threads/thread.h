@@ -84,7 +84,7 @@ class Thread {
     int machineState[MachineStateSize];  // all registers except for stackTop
 
   public:
-    Thread(char* debugName);		// initialize a Thread 
+    Thread(char* debugName, int tid);	    // initialize a Thread
     ~Thread(); 				// deallocate a Thread
 					// NOTE -- thread being deleted
 					// must not be running when delete 
@@ -102,6 +102,7 @@ class Thread {
     void CheckOverflow();   			// Check if thread has 
 						// overflowed its stack
     void setStatus(ThreadStatus st) { status = st; }
+    ThreadStatus getStatus(){ return status;};
     char* getName() { return (name); }
     int getThreadID() {return threadID; }
     int getUserID() {return userID; }

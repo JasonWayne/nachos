@@ -24,7 +24,9 @@
 					// execution stack, for detecting 
 					// stack overflows
 
+
 int GetAvailableThreadID() { return 1;}
+
 
 //----------------------------------------------------------------------
 // Thread::Thread
@@ -34,11 +36,9 @@ int GetAvailableThreadID() { return 1;}
 //	"threadName" is an arbitrary string, useful for debugging.
 //----------------------------------------------------------------------
 
-Thread::Thread(char* threadName)
-{
+Thread::Thread(char* threadName, int tid) {
     name = threadName;
-    threadID = GetAvailableThreadID();
-    //
+    threadID = tid;
     userID = DEFAULT_USER_ID;
     stackTop = NULL;
     stack = NULL;
@@ -46,6 +46,7 @@ Thread::Thread(char* threadName)
 #ifdef USER_PROGRAM
     space = NULL;
 #endif
+
 }
 
 //----------------------------------------------------------------------
