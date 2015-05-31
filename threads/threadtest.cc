@@ -67,7 +67,7 @@ ThreadTest2()
 
 	Thread *t1 = threadManager->createThread("Thread1 Low");
 	t1->setPriority(PRIORITY_LOW);
-	Thread *t2 = threadManager->createThread("Thread2 High");
+	Thread *t2 = threadManager->createThread("Thread2 MID");
 	t2->setPriority(PRIORITY_MID);
 	Thread *t3 = threadManager->createThread("Thread3 High");
 	t3->setPriority(PRIORITY_HIGH);
