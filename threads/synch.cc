@@ -67,8 +67,8 @@ Semaphore::P()
     IntStatus oldLevel = interrupt->SetLevel(IntOff);	// disable interrupts
     
     while (value == 0) { 			// semaphore not available
-	queue->Append((void *)currentThread);	// so go to sleep
-	currentThread->Sleep();
+    	queue->Append((void *)currentThread);	// so go to sleep
+		currentThread->Sleep();
     } 
     value--; 					// semaphore available, 
 						// consume its value
@@ -92,21 +92,101 @@ Semaphore::V()
 
     thread = (Thread *)queue->Remove();
     if (thread != NULL)	   // make thread ready, consuming the V immediately
-	scheduler->ReadyToRun(thread);
+    	scheduler->ReadyToRun(thread);
     value++;
+
+
     (void) interrupt->SetLevel(oldLevel);
 }
 
 // Dummy functions -- so we can compile our later assignments 
 // Note -- without a correct implementation of Condition::Wait(), 
 // the test case in the network assignment won't work!
-Lock::Lock(char* debugName) {}
-Lock::~Lock() {}
-void Lock::Acquire() {}
-void Lock::Release() {}
+Lock::Lock(char* debugName) {
+	name = debugName;
+	lock = new Semaphore("lock semephore", 1);
+	lockHolder = NULL;
+}
+Lock::~Lock() {
+	delete lock;
+}
+void Lock::Acquire() {
+	IntStatus oldLevel = interrupt->SetLevel(IntOff);
+	lock->P();
+	lockHolder = currentThread;
+	interrupt->SetLevel(IntOn);
+}
+void Lock::Release() {
+	ASSERT (isHeldByCurrentThread());
 
-Condition::Condition(char* debugName) { }
-Condition::~Condition() { }
-void Condition::Wait(Lock* conditionLock) { ASSERT(FALSE); }
-void Condition::Signal(Lock* conditionLock) { }
-void Condition::Broadcast(Lock* conditionLock) { }
+	IntStatus oldLevel = interrupt->SetLevel(IntOff);
+	lock->V();
+	lockHolder = NULL;
+	interrupt->SetLevel(IntOn);
+
+}
+
+bool Lock::isHeldByCurrentThread() {
+	return lockHolder == currentThread;
+}
+
+Condition::Condition(char* debugName) {
+	name = debugName;
+	waitingList = new List();
+}
+Condition::~Condition() {
+	delete waitingList;
+}
+void Condition::Wait(Lock* conditionLock) {
+	// 1. disable interrupt
+	IntStatus oldLevel = interrupt->SetLevel(IntOff);
+
+	// 2. assert the condition lock belong to current thread
+	ASSERT(conditionLock->isHeldByCurrentThread());
+
+	// 3. release condition lock because condition segment outside must be locked
+	conditionLock->Release();
+
+	// 4. add thread in waiting list and sleeping for condition matching
+	waitingList->Append((void*)currentThread);
+	currentThread->Sleep();
+
+	// 5. condition matching, so it's time to acquire the condition lock
+	conditionLock->Acquire();
+
+	// 6. resume interrupt
+	(void)interrupt->SetLevel(oldLevel);
+}
+void Condition::Signal(Lock* conditionLock) {
+	// 1. disable interrupt
+	IntStatus oldLevel = interrupt->SetLevel(IntOff);
+
+	// 2. assert the condition lock belong to current thread
+	ASSERT(conditionLock->isHeldByCurrentThread());
+
+	// 3. condition matching, so find a thread to schedule in waiting list
+	if (!waitingList->IsEmpty())
+	{
+		Thread* waitingThread = (Thread*)waitingList->Remove();
+		scheduler->ReadyToRun(waitingThread);
+	}
+
+	// 4. resume interrupt
+	(void)interrupt->SetLevel(oldLevel);
+}
+void Condition::Broadcast(Lock* conditionLock) {
+	// 1. disable interrupt
+	IntStatus oldLevel = interrupt->SetLevel(IntOff);
+
+	// 2. assert the condition lock belong to current thread
+	ASSERT(conditionLock->isHeldByCurrentThread());
+
+	// 3. signal all threads waiting in list
+	while (!waitingList->IsEmpty())
+	{
+		Signal(conditionLock);
+	}
+
+	// 4. resume interrupt
+	(void)interrupt->SetLevel(oldLevel);
+}
