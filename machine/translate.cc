@@ -311,7 +311,7 @@ Machine::fillPageTableAndTLB(int virtAddr)
 		}
 
 		// 2-3. Mapping the executable file identifier with physical page.
-//		executable = currentThread->space->getExeFileId();
+		executable = currentThread->space->getExeFileId();
 		machine->phyMemManager->setFileIdentifier(physicalPage, (int)executable);
 
 		// 2-4. Update page table with new physical page number.
