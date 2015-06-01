@@ -58,6 +58,7 @@ Machine::Machine(bool debug)
 
     for (i = 0; i < NumTotalRegs; i++)
         registers[i] = 0;
+    phyMemManager = new PhyMemManager(NumPhysPages);
     mainMemory = new char[MemorySize];
     for (i = 0; i < MemorySize; i++)
       	mainMemory[i] = 0;
@@ -85,6 +86,7 @@ Machine::Machine(bool debug)
 
 Machine::~Machine()
 {
+	delete phyMemManager;
     delete [] mainMemory;
     if (tlb != NULL)
         delete [] tlb;
