@@ -433,7 +433,7 @@ translate.o: ../machine/translate.cc ../threads/copyright.h \
  ../threads/system.h ../threads/utility.h ../threads/thread.h \
  ../machine/machine.h ../threads/scheduler.h ../threads/list.h \
  ../machine/interrupt.h ../threads/list.h ../machine/stats.h \
- ../machine/timer.h ../threads/threadmanager.h
+ ../machine/timer.h ../threads/threadmanager.h ../bin/noff.h
 phymemmanager.o: ../machine/phymemmanager.cc ../machine/phymemmanager.h \
  ../userprog/bitmap.h ../threads/copyright.h ../threads/utility.h \
  ../threads/copyright.h ../threads/bool.h ../machine/sysdep.h \
