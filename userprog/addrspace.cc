@@ -90,7 +90,8 @@ AddrSpace::AddrSpace(OpenFile *executable)
     for (i = 0; i < numPages; i++) {
 	pageTable[i].virtualPage = i;	// for now, virtual page # = phys page #
 	pageTable[i].physicalPage = machine->phyMemManager->FindOnePage();
-	pageTable[i].valid = TRUE;
+//	pageTable[i].valid = TRUE;
+	pageTable[i].valid = FALSE;
 	pageTable[i].use = FALSE;
 	pageTable[i].dirty = FALSE;
 	pageTable[i].readOnly = FALSE;  // if the code segment was entirely on 
@@ -100,21 +101,21 @@ AddrSpace::AddrSpace(OpenFile *executable)
     
 // zero out the entire address space, to zero the unitialized data segment 
 // and the stack segment
-    bzero(machine->mainMemory, size);
+//    bzero(machine->mainMemory, size);
 
 // then, copy in the code and data segments into memory
-    if (noffH.code.size > 0) {
-        DEBUG('a', "Initializing code segment, at 0x%x, size %d\n", 
-			noffH.code.virtualAddr, noffH.code.size);
-        executable->ReadAt(&(machine->mainMemory[noffH.code.virtualAddr]),
-			noffH.code.size, noffH.code.inFileAddr);
-    }
-    if (noffH.initData.size > 0) {
-        DEBUG('a', "Initializing data segment, at 0x%x, size %d\n", 
-			noffH.initData.virtualAddr, noffH.initData.size);
-        executable->ReadAt(&(machine->mainMemory[noffH.initData.virtualAddr]),
-			noffH.initData.size, noffH.initData.inFileAddr);
-    }
+//    if (noffH.code.size > 0) {
+//        DEBUG('a', "Initializing code segment, at 0x%x, size %d\n",
+//			noffH.code.virtualAddr, noffH.code.size);
+//        executable->ReadAt(&(machine->mainMemory[noffH.code.virtualAddr]),
+//			noffH.code.size, noffH.code.inFileAddr);
+//    }
+//    if (noffH.initData.size > 0) {
+//        DEBUG('a', "Initializing data segment, at 0x%x, size %d\n",
+//			noffH.initData.virtualAddr, noffH.initData.size);
+//        executable->ReadAt(&(machine->mainMemory[noffH.initData.virtualAddr]),
+//			noffH.initData.size, noffH.initData.inFileAddr);
+//    }
 
 }
 

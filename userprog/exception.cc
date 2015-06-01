@@ -25,6 +25,15 @@
 #include "system.h"
 #include "syscall.h"
 
+static void PageFaultExceptionHandler()
+{
+	int addr = machine->ReadRegister(2);
+    int vpn = (unsigned) addr / PageSize;
+
+	machine->fillPageTableAndTLB(vpn);
+	stats->numPageFaults++;
+}
+
 //----------------------------------------------------------------------
 // ExceptionHandler
 // 	Entry point into the Nachos kernel.  Called when a user program
@@ -57,6 +66,7 @@ ExceptionHandler(ExceptionType which)
 	switch (which)
 	{
 		case SyscallException:
+		{
 			switch (type)
 			{
 				case SC_Halt:
@@ -68,13 +78,10 @@ ExceptionHandler(ExceptionType which)
 					break;
 			}
 			break;
+		}
 
 		case PageFaultException:
-		    int vpn = (unsigned) virtAddr / PageSize;
-		    int addr = (unsigned) addr / PageSize;
-
-			machine->fillPageTableAndTLB(vpn);
-			stats->numPageFaults++;
+			PageFaultExceptionHandler();
 			break;
 
 		default:
@@ -82,3 +89,5 @@ ExceptionHandler(ExceptionType which)
 			break;
 	}
 }
+
+
