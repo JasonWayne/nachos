@@ -18,11 +18,17 @@ class PhyMemManager
 		~PhyMemManager();
 
 		int FindOnePage();
+		void setFileIdentifier(int page, int value);
+		int  getFileIdentifier(int page);
+		void setDirty(int page, bool value);
+		bool getDirty(int page);
 
 	private:
 		int pageNum;
 		BitMap *memoryMap;
 		int *lastModifyTime;
+		int *fileIdentifier;
+		bool *dirty;
 };
 
 

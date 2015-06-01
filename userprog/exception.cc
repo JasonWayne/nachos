@@ -70,14 +70,11 @@ ExceptionHandler(ExceptionType which)
 			break;
 
 		case PageFaultException:
-			//TODO
-			break;
+		    int vpn = (unsigned) virtAddr / PageSize;
+		    int addr = (unsigned) addr / PageSize;
 
-		case TLBMissException:
-			if (machine->tlb != NULL)
-			{
-				//TODO
-			}
+			machine->fillPageTableAndTLB(vpn);
+			stats->numPageFaults++;
 			break;
 
 		default:

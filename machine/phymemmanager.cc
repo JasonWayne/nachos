@@ -10,12 +10,18 @@
 
 PhyMemManager::PhyMemManager(int num)
 {
+	int i;
+
 	pageNum = num;
 	memoryMap = new BitMap(num);
+
 	lastModifyTime = new int[num];
-	for (int i = 0; i < num - 1; i++)
+	fileIdentifier = new int[num];
+	dirty = new bool[num];
+	for (i = 0; i < num - 1; i++)
 	{
 		lastModifyTime[i] = 0;
+		dirty[i] = false;
 	}
 }
 
@@ -23,6 +29,9 @@ PhyMemManager::~PhyMemManager()
 {
 	delete memoryMap;
 	delete lastModifyTime;
+
+	delete fileIdentifier;
+	delete dirty;
 }
 
 int
@@ -59,6 +68,56 @@ PhyMemManager::FindOnePage()
 	}
 
 	return page;
+}
+
+bool
+PhyMemManager::getDirty(int page)
+{
+	if (page < 0)
+	{
+		page = 0;
+	}
+
+	if (page >= pageNum)
+	{
+		page = pageNum - 1;
+	}
+
+	return (dirty[page]);
+}
+
+void
+PhyMemManager::setDirty(int page, bool value)
+{
+	if (page >= 0 && page < pageNum)
+	{
+		dirty[page] = value;
+	}
+}
+
+int
+PhyMemManager::getFileIdentifier(int page)
+{
+	if (page < 0)
+	{
+		page = 0;
+	}
+
+	if (page >= pageNum)
+	{
+		page = pageNum - 1;
+	}
+
+	return (fileIdentifier[page]);
+}
+
+void
+PhyMemManager::setFileIdentifier(int page, int value)
+{
+	if (page >= 0 && page < pageNum)
+	{
+		fileIdentifier[page] = value;
+	}
 }
 
 
