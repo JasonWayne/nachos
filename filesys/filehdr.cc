@@ -153,6 +153,7 @@ FileHeader::Print()
 				printf("\\%x", (unsigned char)data[j]);
 			}
 		}
+	}
     delete [] data;
 }
 

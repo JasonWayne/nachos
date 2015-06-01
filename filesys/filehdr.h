@@ -63,9 +63,9 @@ class FileHeader {
 
     int FileLength();			// Return the length of the file in bytes
 	FileType GetFileType(); 	// Return the type of the file
-	time_t GetCreateTime(); // return the create time in TimeWrapper format
-	time_t GetAccessTime(); // return the access time in TimeWrapper format
-	time_t GetModifyTime(); // return the modify time in TimeWrapper format
+	TimeWrapper GetCreateTime(); // return the create time in TimeWrapper format
+	TimeWrapper GetAccessTime(); // return the access time in TimeWrapper format
+	TimeWrapper GetModifyTime(); // return the modify time in TimeWrapper format
 
     void Print();			// Print the contents of the file.
 
