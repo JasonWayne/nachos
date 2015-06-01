@@ -95,7 +95,15 @@ Machine::ReadMem(int addr, int size, int *value)
     
     exception = Translate(addr, &physicalAddress, size, FALSE);
     if (exception != NoException) {
-	machine->RaiseException(exception, addr);
+    	machine->RaiseException(exception, addr);
+		if (exception == PageFaultException)
+		{
+			exception = Translate(addr, &physicalAddress, size, FALSE);
+		}
+		else
+		{
+			return FALSE;
+		}
 	return FALSE;
     }
     switch (size) {
@@ -144,8 +152,15 @@ Machine::WriteMem(int addr, int size, int value)
 
     exception = Translate(addr, &physicalAddress, size, TRUE);
     if (exception != NoException) {
-	machine->RaiseException(exception, addr);
-	return FALSE;
+		machine->RaiseException(exception, addr);
+		if (exception == PageFaultException)
+		{
+			exception = Translate(addr, &physicalAddress, size, TRUE);
+		}
+		else
+		{
+			return FALSE;
+		}
     }
     switch (size) {
       case 1:
@@ -200,37 +215,47 @@ Machine::Translate(int virtAddr, int* physAddr, int size, bool writing)
     }
     
     // we must have either a TLB or a page table, but not both!
-    ASSERT(tlb == NULL || pageTable == NULL);	
-    ASSERT(tlb != NULL || pageTable != NULL);	
+//    ASSERT(tlb == NULL || pageTable == NULL);
+//    ASSERT(tlb != NULL || pageTable != NULL);
 
 // calculate the virtual page number, and offset within the page,
 // from the virtual address
     vpn = (unsigned) virtAddr / PageSize;
     offset = (unsigned) virtAddr % PageSize;
     
-    if (tlb == NULL) {		// => page table => vpn is index into table
-	if (vpn >= pageTableSize) {
-	    DEBUG('a', "virtual page # %d too large for page table size %d!\n", 
-			virtAddr, pageTableSize);
-	    return AddressErrorException;
-	} else if (!pageTable[vpn].valid) {
-	    DEBUG('a', "virtual page # %d too large for page table size %d!\n", 
-			virtAddr, pageTableSize);
-	    return PageFaultException;
+	if (vpn >= pageTableSize)
+	{
+		DEBUG('a', "virtual page # %d too large for page table size %d!\n",
+						virtAddr, pageTableSize);
+		return AddressErrorException;
 	}
-	entry = &pageTable[vpn];
-    } else {
+
+	if (tlb == NULL)		// => page table => vpn is index into table
+	{
+		if (!pageTable[vpn].valid)
+		{
+			DEBUG('a', "virtual page # %d too large for page table size %d!\n",
+				virtAddr, pageTableSize);
+			return PageFaultException;
+		}
+		entry = &pageTable[vpn];
+	} else {
         for (entry = NULL, i = 0; i < TLBSize; i++)
-    	    if (tlb[i].valid && (tlb[i].virtualPage == vpn)) {
-		entry = &tlb[i];			// FOUND!
-		break;
-	    }
-	if (entry == NULL) {				// not found
+		{
+    	    if (tlb[i].valid && (tlb[i].virtualPage == vpn))
+			{
+				entry = &tlb[i];			// FOUND!
+				tlb[i].lastTime = stats->totalTicks;
+				break;
+			}
+		}
+
+        if (entry == NULL) {				// not found
     	    DEBUG('a', "*** no valid TLB entry found for this virtual page!\n");
-    	    return PageFaultException;		// really, this is a TLB fault,
+    	    return TLBMissException;		// really, this is a TLB fault,
 						// the page may be in memory,
 						// but not in the TLB
-	}
+        }
     }
 
     if (entry->readOnly && writing) {	// trying to write to a read-only page
@@ -252,4 +277,45 @@ Machine::Translate(int virtAddr, int* physAddr, int size, bool writing)
     ASSERT((*physAddr >= 0) && ((*physAddr + size) <= MemorySize));
     DEBUG('a', "phys addr = 0x%x\n", *physAddr);
     return NoException;
+}
+
+void
+Machine::fillTLBEntry(int virtAddr)
+{
+	int i;
+	int minTime = tlb[0].lastTime;
+    unsigned int vpn;
+	TranslationEntry *entry = &tlb[0];
+
+	// 1. Calculate virtual page which contains virtual address.
+    vpn = (unsigned) virtAddr / PageSize;
+
+	// 2. Is the virtual page in the memory or not.
+	if (!pageTable[vpn].valid)
+	{
+	}
+
+	// 3. Find the proper TLB entry.
+	for (i = 0; i < TLBSize; i++)
+	{
+		if (!tlb[i].valid)
+		{
+			entry = &tlb[i];
+			break;
+		}
+
+		if (tlb[i].lastTime < minTime)
+		{
+			minTime = tlb[i].lastTime;
+			entry = &tlb[i];
+		}
+	}
+
+	// 4. Put the page entry into TLB by swapping.
+	if (entry->valid)
+	{
+		pageTable[entry->virtualPage] = *entry;
+	}
+	*entry = pageTable[vpn];
+	entry->lastTime = stats->totalTicks;
 }

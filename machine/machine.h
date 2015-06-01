@@ -48,7 +48,7 @@ enum ExceptionType { NoException,           // Everything ok!
 					    // address space
 		     OverflowException,     // Integer overflow in add or sub.
 		     IllegalInstrException, // Unimplemented or reserved instr.
-		     
+			 TLBMissException,
 		     NumExceptionTypes
 };
 
@@ -125,6 +125,7 @@ class Machine {
     				// Run one instruction of a user program.
     void DelayedLoad(int nextReg, int nextVal);  	
 				// Do a pending delayed load (modifying a reg)
+    void fillTLBEntry(int virAddr);
     
     bool ReadMem(int addr, int size, int* value);
     bool WriteMem(int addr, int size, int value);
